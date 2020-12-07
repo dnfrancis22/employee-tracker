@@ -13,11 +13,11 @@ var connection = mysql.createConnection({
 
   // Your password
   password: "pho12345",
-  database: "employee_trackerDB"
+  database: "employee_trackerDB",
 });
 
 // connect to the mysql server and sql database
-connection.connect(function(err) {
+connection.connect(function (err) {
   if (err) throw err;
   // run the start function after the connection is made to prompt the user
   start();
@@ -25,22 +25,56 @@ connection.connect(function(err) {
 
 // function which prompts the user for what action they should take
 function start() {
-    inquirer
-      .prompt({
-        name: "postOrBid",
-        type: "list",
-        message: "Would you like to [POST] an auction or [BID] on an auction?",
-        choices: ["POST", "BID", "EXIT"]
-      })
-      .then(function(answer) {
-        // based on their answer, either call the bid or the post functions
-        if (answer.postOrBid === "POST") {
-          postAuction();
-        }
-        else if(answer.postOrBid === "BID") {
-          bidAuction();
-        } else{
-          connection.end();
-        }
-      });
-  }
+  inquirer
+    .prompt({
+      name: "action",
+      type: "rawlist",
+      message: "What would you like to do?",
+      choices: [
+        "View departments",
+        "View roles",
+        "View employees",
+        "Add departments",
+        "Add roles",
+        "Add employees",
+        "Update employee roles",
+        "End"
+      ],
+    })
+    .then(function (answer) {
+      // based on their answer
+      switch (answer) {
+          case "View departments":
+          viewDept();
+          break;
+
+          case "View roles":
+          viewRole();
+          break;
+
+          case "View employees":
+          viewEmp();
+          break;
+
+          case "Add departments":
+          addDept();
+          break;
+
+          case "Add roles":
+          addRole();
+          break;
+
+          case "Add employees":
+          addEmp();
+          break;
+
+          case "Update employee roles":
+          updateEmp();
+          break;
+
+          case "End":
+          end();
+          break;
+      }
+    });
+}
