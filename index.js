@@ -123,7 +123,45 @@ function addDept() {
           console.log("Your department was created successfully!");
           // display the new list of departments and re-prompt the user.
           viewDept()
-          start();
+        }
+      );
+    });
+}
+// function to add role
+function addRole() {
+  // prompt for info about the role
+  inquirer
+    .prompt([
+      {
+        name: "title",
+        type: "input",
+        message: "What is the title of the role that you want to add?"
+      },
+      {
+        name: "salary",
+        type: "input",
+        message: "What is the salary for the role that you want to add?"
+      },
+      {
+        name: "department_id",
+        type: "input",
+        message: "What is the department_id for the role that you want to add?"
+      },
+    ])
+    .then(function(answer) {
+      // when finished prompting, insert a new role into the db with that info
+      connection.query(
+        "INSERT INTO role SET ?",
+        {
+          title: answer.title,
+          salary: answer.salary,
+          department_id: answer.department_id,
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your role was created successfully!");
+          // display the new list of roles and re-prompt the user.
+          viewRole()
         }
       );
     });
