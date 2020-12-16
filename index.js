@@ -100,3 +100,31 @@ function viewEmp() {
     start();
   });
 }
+// function to add department
+function addDept() {
+  // prompt for info about the department
+  inquirer
+    .prompt([
+      {
+        name: "name",
+        type: "input",
+        message: "What is the name of the department that you want to add?"
+      },
+    ])
+    .then(function(answer) {
+      // when finished prompting, insert a new department into the db with that info
+      connection.query(
+        "INSERT INTO department SET ?",
+        {
+          name: answer.name,
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your department was created successfully!");
+          // display the new list of departments and re-prompt the user.
+          viewDept()
+          start();
+        }
+      );
+    });
+}
