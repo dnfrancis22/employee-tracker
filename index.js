@@ -43,7 +43,7 @@ function start() {
     })
     .then(function (answer) {
       // based on their answer
-      switch (answer) {
+      switch (answer.action) {
           case "View departments":
           viewDept();
           break;
@@ -77,4 +77,26 @@ function start() {
           break;
       }
     });
+}
+function viewDept() {
+  connection.query("SELECT * FROM department", function(err, res) {
+    if (err) throw err;
+    console.table(res);
+    start();
+  });
+}
+
+function viewRole() {
+  connection.query("SELECT * FROM role", function(err, res) {
+    if (err) throw err;
+    console.table(res);
+    start();
+  });
+}
+function viewEmp() {
+  connection.query("SELECT first_name,last_name,manager,title,salary,name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id", function(err, res) {
+    if (err) throw err;
+    console.table(res);
+    start();
+  });
 }
