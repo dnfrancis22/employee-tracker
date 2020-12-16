@@ -94,7 +94,7 @@ function viewRole() {
   });
 }
 function viewEmp() {
-  connection.query("SELECT first_name,last_name,manager,title,salary,name FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id", function(err, res) {
+  connection.query("SELECT first_name,last_name,manager,title,salary,department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id", function(err, res) {
     if (err) throw err;
     console.table(res);
     start();
@@ -165,4 +165,56 @@ function addRole() {
         }
       );
     });
+}
+// function to add employee
+function addEmp() {
+  connection.query("SELECT first_name,last_name FROM role JOIN employee ON employee.role_id = role.id WHERE title = 'Sales Manager' OR title = 'Marketing Manager' or title = 'Engineering Manager';", function(err, res) {
+    if (err) throw err;
+
+// prompt for info about the employee
+    inquirer
+    .prompt([
+      {
+        name: "first_name",
+        type: "input",
+        message: "What is the first name of the employee that you want to add?"
+      },
+      {
+        name: "last_name",
+        type: "input",
+        message: "What is the last name of the employee that you want to add?"
+      },
+      {
+        name: "role_id",
+        type: "input",
+        message: "What is the role_id for the employee that you want to add?"
+      },
+      {
+        name: "manager",
+        type: "list",
+        choices: res.map((manager) => manager.first_name + " " + manager.last_name),
+      },
+    ])
+    .then(function(answer) {
+
+      // when finished prompting, insert a new employee into the db with that info
+      connection.query(
+        "INSERT INTO employee SET ?",
+        {
+          first_name: answer.first_name,
+          last_name: answer.last_name,
+          role_id: answer.role_id,
+          manager: answer.manager,
+        },
+        function(err) {
+          if (err) throw err;
+          console.log("Your role was created successfully!");
+          // display the new list of roles and re-prompt the user.
+          viewEmp()
+        }
+      );
+    });
+ }); 
+
+  
 }
