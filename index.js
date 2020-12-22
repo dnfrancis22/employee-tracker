@@ -38,48 +38,48 @@ function start() {
         "Add roles",
         "Add employees",
         "Update employee roles",
-        "End"
+        "End",
       ],
     })
     .then(function (answer) {
       // based on their answer
       switch (answer.action) {
-          case "View departments":
+        case "View departments":
           viewDept();
           break;
 
-          case "View roles":
+        case "View roles":
           viewRole();
           break;
 
-          case "View employees":
+        case "View employees":
           viewEmp();
           break;
 
-          case "Add departments":
+        case "Add departments":
           addDept();
           break;
 
-          case "Add roles":
+        case "Add roles":
           addRole();
           break;
 
-          case "Add employees":
+        case "Add employees":
           addEmp();
           break;
 
-          case "Update employee roles":
+        case "Update employee roles":
           updateEmp();
           break;
 
-          case "End":
+        case "End":
           end();
           break;
       }
     });
 }
 function viewDept() {
-  connection.query("SELECT * FROM department", function(err, res) {
+  connection.query("SELECT * FROM department", function (err, res) {
     if (err) throw err;
     console.table(res);
     start();
@@ -87,18 +87,21 @@ function viewDept() {
 }
 
 function viewRole() {
-  connection.query("SELECT * FROM role", function(err, res) {
+  connection.query("SELECT * FROM role", function (err, res) {
     if (err) throw err;
     console.table(res);
     start();
   });
 }
 function viewEmp() {
-  connection.query("SELECT first_name,last_name,manager,title,salary,department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id", function(err, res) {
-    if (err) throw err;
-    console.table(res);
-    start();
-  });
+  connection.query(
+    "SELECT employee.id,first_name,last_name,manager,title,salary,department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id",
+    function (err, res) {
+      if (err) throw err;
+      console.table(res);
+      start();
+    }
+  );
 }
 // function to add department
 function addDept() {
@@ -108,21 +111,21 @@ function addDept() {
       {
         name: "department",
         type: "input",
-        message: "What is the name of the department that you want to add?"
+        message: "What is the name of the department that you want to add?",
       },
     ])
-    .then(function(answer) {
+    .then(function (answer) {
       // when finished prompting, insert a new department into the db with that info
       connection.query(
         "INSERT INTO department SET ?",
         {
           department: answer.department,
         },
-        function(err) {
+        function (err) {
           if (err) throw err;
           console.log("Your department was created successfully!");
           // display the new list of departments and re-prompt the user.
-          viewDept()
+          viewDept();
         }
       );
     });
@@ -135,20 +138,20 @@ function addRole() {
       {
         name: "title",
         type: "input",
-        message: "What is the title of the role that you want to add?"
+        message: "What is the title of the role that you want to add?",
       },
       {
         name: "salary",
         type: "input",
-        message: "What is the salary for the role that you want to add?"
+        message: "What is the salary for the role that you want to add?",
       },
       {
         name: "department_id",
         type: "input",
-        message: "What is the department_id for the role that you want to add?"
+        message: "What is the department_id for the role that you want to add?",
       },
     ])
-    .then(function(answer) {
+    .then(function (answer) {
       // when finished prompting, insert a new role into the db with that info
       connection.query(
         "INSERT INTO role SET ?",
@@ -157,67 +160,118 @@ function addRole() {
           salary: answer.salary,
           department_id: answer.department_id,
         },
-        function(err) {
+        function (err) {
           if (err) throw err;
           console.log("Your role was created successfully!");
           // display the new list of roles and re-prompt the user.
-          viewRole()
+          viewRole();
         }
       );
     });
 }
 // function to add employee
 function addEmp() {
-  connection.query("SELECT first_name,last_name,role_id,title FROM role JOIN employee ON employee.role_id = role.id WHERE title = 'Sales Manager' OR title = 'Marketing Manager' or title = 'Engineering Manager';", function(err, res) {
-    if (err) throw err;
+  connection.query(
+    "SELECT first_name,last_name,role_id,title FROM role JOIN employee ON employee.role_id = role.id WHERE title = 'Sales Manager' OR title = 'Marketing Manager' or title = 'Engineering Manager';",
+    function (err, res) {
+      if (err) throw err;
 
-// prompt for info about the employee
-    inquirer
-    .prompt([
-      {
-        name: "first_name",
-        type: "input",
-        message: "What is the first name of the employee that you want to add?"
-      },
-      {
-        name: "last_name",
-        type: "input",
-        message: "What is the last name of the employee that you want to add?"
-      },
-      {
-        name: "role_id",
-        type: "input",
-        message: "What is the role id of the employee that you want to add?"
-      },
-      {
-        name: "manager",
-        type: "list",
-        choices: res.map((manager) => manager.first_name + " " + manager.last_name),
-      },
-    ])
-    .then(function(answer) {
+      // prompt for info about the employee
+      inquirer
+        .prompt([
+          {
+            name: "first_name",
+            type: "input",
+            message:
+              "What is the first name of the employee that you want to add?",
+          },
+          {
+            name: "last_name",
+            type: "input",
+            message:
+              "What is the last name of the employee that you want to add?",
+          },
+          {
+            name: "role_id",
+            type: "input",
+            message:
+              "What is the role id of the employee that you want to add?",
+          },
+          {
+            name: "manager",
+            type: "list",
+            message: "Choose the manager of the employee that you want to add?",
+            choices: res.map(
+              (manager) => manager.first_name + " " + manager.last_name
+            ),
+          },
+        ])
+        .then(function (answer) {
+          // when finished prompting, insert a new employee into the db with that info
+          connection.query(
+            "INSERT INTO employee SET ?",
+            {
+              first_name: answer.first_name,
+              last_name: answer.last_name,
+              role_id: answer.role_id,
+              manager: answer.manager,
+            },
+            function (err) {
+              if (err) throw err;
+              console.log("Your employee was added successfully!");
+              // display the new list of employees and re-prompt the user.
+              viewEmp();
+            }
+          );
+        });
+    }
+  );
+}
+function updateEmp() {
+  connection.query(
+    "SELECT first_name,last_name FROM employee;",
+    function (err, res) {
+      if (err) throw err;
 
-      // when finished prompting, insert a new employee into the db with that info
-      connection.query(
-        "INSERT INTO employee SET ?",
-        {
-          first_name: answer.first_name,
-          last_name: answer.last_name,
-          role_id: answer.role_id,
-          manager: answer.manager,
-        },
-        function(err) {
-          if (err) throw err;
-          console.log("Your employee was added successfully!");
-          // display the new list of employees and re-prompt the user.
-          viewEmp()
-        }
-      );
-    });
- }); 
+      // prompt for info about the employee
+      inquirer
+        .prompt([
+          {
+            name: "employeeId",
+            type: "input",
+            message: "What is the id of the employee that you want to update?",
+          },
+          {
+            name: "role_id",
+            type: "input",
+            message: "What is the new role id?",
+          },
+        ])
+        .then(function (answer) {
+          // when finished prompting, insert a new employee into the db with that info
+          connection.query(
+            "UPDATE employee SET ? WHERE ?",
+            [
+              {
+                role_id: answer.role_id,
+              },
+              {
+                id: answer.employeeId,
+              },
+            ],
+            function (err) {
+              if (err) throw err;
+              console.log("Your employee was added successfully!");
+              // display the new list of employees and re-prompt the user.
+              viewEmp();
+            }
+          );
+        });
+    }
+  );
 }
 
-function end(){
-  console.log("Your session has ended.")
+function end() {
+  console.log("Your session has ended.");
   connection.end();
 }
