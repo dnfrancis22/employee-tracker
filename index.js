@@ -23,7 +23,7 @@ connection.connect(function (err) {
   start();
 });
 
-// function which prompts the user for what action they should take
+// function which prompts the user for what action they want to take
 function start() {
   inquirer
     .prompt({
@@ -42,7 +42,7 @@ function start() {
       ],
     })
     .then(function (answer) {
-      // based on their answer
+      // the switch case calls the function based on the users answer
       switch (answer.action) {
         case "View departments":
           viewDept();
@@ -78,6 +78,7 @@ function start() {
       }
     });
 }
+// function that allows the user to view all of the departments
 function viewDept() {
   connection.query("SELECT * FROM department", function (err, res) {
     if (err) throw err;
@@ -85,7 +86,7 @@ function viewDept() {
     start();
   });
 }
-
+// function that allows the user to view all of the roles
 function viewRole() {
   connection.query("SELECT * FROM role", function (err, res) {
     if (err) throw err;
@@ -93,6 +94,7 @@ function viewRole() {
     start();
   });
 }
+// function that allows the user to view all of the employees
 function viewEmp() {
   connection.query(
     "SELECT employee.id,first_name,last_name,manager,title,salary,department FROM employee JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id",
@@ -103,9 +105,9 @@ function viewEmp() {
     }
   );
 }
-// function to add department
+// function to add a department
 function addDept() {
-  // prompt for info about the department
+  // prompt the user for info about the department
   inquirer
     .prompt([
       {
@@ -130,9 +132,9 @@ function addDept() {
       );
     });
 }
-// function to add role
+// function to add a role
 function addRole() {
-  // prompt for info about the role
+  // prompt the user for info about the role
   inquirer
     .prompt([
       {
@@ -169,14 +171,15 @@ function addRole() {
       );
     });
 }
-// function to add employee
+// function to add an employee
 function addEmp() {
+  // a query that will provide a list of managers for the user to choose from
   connection.query(
     "SELECT first_name,last_name,role_id,title FROM role JOIN employee ON employee.role_id = role.id WHERE title = 'Sales Manager' OR title = 'Marketing Manager' or title = 'Engineering Manager';",
     function (err, res) {
       if (err) throw err;
 
-      // prompt for info about the employee
+      // prompt the user for info about the employee
       inquirer
         .prompt([
           {
@@ -201,6 +204,7 @@ function addEmp() {
             name: "manager",
             type: "list",
             message: "Choose the manager of the employee that you want to add?",
+            // res.map takes the object that was returned from the query and converts it to a string of choices.
             choices: res.map(
               (manager) => manager.first_name + " " + manager.last_name
             ),
@@ -227,6 +231,7 @@ function addEmp() {
     }
   );
 }
+// function to update an employees role
 function updateEmp() {
   connection.query(
     "SELECT first_name,last_name FROM employee;",
@@ -248,7 +253,7 @@ function updateEmp() {
           },
         ])
         .then(function (answer) {
-          // when finished prompting, insert a new employee into the db with that info
+          // when finished prompting, update the employee's role in the db with that info
           connection.query(
             "UPDATE employee SET ? WHERE ?",
             [
@@ -270,7 +275,7 @@ function updateEmp() {
     }
   );
 }
-
+// this functions ends the connection.
 function end() {
   console.log("Your session has ended.");
   connection.end();
