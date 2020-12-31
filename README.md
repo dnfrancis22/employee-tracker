@@ -21,8 +21,9 @@ When you run npm start you are prompted with list of actions.
 "Update employee roles",
  "End",
 
- Based on you response you will be prompted with further questions.       
-
+Based on you response you will be prompted with further questions.       
+Here is a link to a demo of the app.
+https://drive.google.com/file/d/1OehPAbps8FI9j08feN731solTNAP9g3A/view?usp=sharing
 
 ![demo](./assets/employee-tracker-demo.gif)
 
